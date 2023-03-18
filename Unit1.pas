@@ -16,7 +16,6 @@ type
     TraySettings: TMenuItem;
     TrayExit: TMenuItem;
     clpBrdTimer: TTimer;
-    Button1: TButton;
     procedure OnClipboardTextChanged(ClpbrdText: String);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure TrayIconClick(Sender: TObject);
@@ -25,7 +24,6 @@ type
     procedure TraySettingsClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure clpBrdTimerTimer(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -85,11 +83,6 @@ begin
   end;
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
-begin
-  ShowMessage('Helo world!') ;
-end;
-
 procedure TMainForm.clpBrdTimerTimer(Sender: TObject);
 var
   ClpbrdText: string;
@@ -113,11 +106,16 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
+  if (not sSkinManager.Active) then
+    sSkinManager.Active := True;
+
   if (SettingsForm.stClientDataSet.Active) then
     Exit;
   SettingsForm.stClientDataSet.FileName := ExtractFilePath(Application.ExeName)
     + 'Settings.cds';
   SettingsForm.stClientDataSet.Active := True;
+  if (SettingsForm.sDBLinkReplace.Checked) then
+    clpBrdTimer.Enabled := True;
 end;
 
 procedure TMainForm.TrayExitClick(Sender: TObject);
@@ -137,7 +135,8 @@ end;
 
 procedure TMainForm.TraySettingsClick(Sender: TObject);
 begin
-  SettingsForm.ShowModal();
+  if (SettingsForm.FormState <> [fsModal]) then
+    SettingsForm.ShowModal();
 end;
 
 end.
