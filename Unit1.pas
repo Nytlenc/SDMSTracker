@@ -87,7 +87,7 @@ end;
 
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
-  ShowMessage('Helo world!');
+  ShowMessage('Helo world!') ;
 end;
 
 procedure TMainForm.clpBrdTimerTimer(Sender: TObject);
