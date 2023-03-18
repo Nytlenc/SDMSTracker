@@ -16,6 +16,7 @@ type
     TraySettings: TMenuItem;
     TrayExit: TMenuItem;
     clpBrdTimer: TTimer;
+    Button1: TButton;
     procedure OnClipboardTextChanged(ClpbrdText: String);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure TrayIconClick(Sender: TObject);
@@ -24,6 +25,7 @@ type
     procedure TraySettingsClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure clpBrdTimerTimer(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -81,6 +83,11 @@ begin
     CutText := Copy(ClpbrdText, 0, esibPos);
     Clipboard.AsText := StringReplace(ClpbrdText, CutText, '', [rfReplaceAll]);
   end;
+end;
+
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  ShowMessage('Helo world!');
 end;
 
 procedure TMainForm.clpBrdTimerTimer(Sender: TObject);
