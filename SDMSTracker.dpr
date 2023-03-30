@@ -2,8 +2,9 @@ program SDMSTracker;
 
 uses
   Vcl.Forms,
-  Unit1 in 'Unit1.pas' {MainForm},
-  Settings in 'Settings.pas' {SettingsForm};
+  MainFormUnit in 'MainFormUnit.pas' {MainForm},
+  Settings in 'Settings.pas' {SettingsForm},
+  SDMSLinkOpenUnit in 'SDMSLinkOpenUnit.pas' {SDMSLinkOpen};
 
 {$R *.res}
 
@@ -12,5 +13,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TSettingsForm, SettingsForm);
+  Application.CreateForm(TSDMSLinkOpen, SDMSLinkOpen);
   Application.Run;
 end.

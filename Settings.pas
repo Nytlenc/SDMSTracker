@@ -37,7 +37,7 @@ implementation
 
 {$R *.dfm}
 
-uses Unit1;
+uses MainFormUnit;
 
 procedure TSettingsForm.FormShow(Sender: TObject);
 begin

@@ -10,10 +10,37 @@ object MainForm: TMainForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDesktopCenter
+  Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
+  OnResize = FormResize
   OnShow = FormShow
   TextHeight = 15
+  object Button1: TButton
+    Left = 8
+    Top = 113
+    Width = 121
+    Height = 41
+    Caption = #1054#1073#1085#1086#1074#1080#1090#1100' '#1047#1072#1076#1072#1095#1080
+    TabOrder = 0
+    OnClick = Button1Click
+  end
+  object TasksGrid: TStringGrid
+    Left = 0
+    Top = 160
+    Width = 620
+    Height = 280
+    Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    ColCount = 1
+    FixedCols = 0
+    RowCount = 1
+    FixedRows = 0
+    TabOrder = 1
+    ExplicitWidth = 616
+    ExplicitHeight = 279
+    RowHeights = (
+      24)
+  end
   object sSkinManager: TsSkinManager
     ButtonsOptions.OldGlyphsMode = False
     InternalSkins = <
@@ -3945,9 +3972,36 @@ object MainForm: TMainForm
   end
   object clpBrdTimer: TTimer
     Enabled = False
-    Interval = 500
+    Interval = 200
     OnTimer = clpBrdTimerTimer
     Left = 272
     Top = 8
+  end
+  object SDMSClient: TRESTClient
+    Authenticator = OAuth2Authenticator
+    BaseURL = 'https://sdms.dns-shop.ru/services/hs/api'
+    Params = <>
+    SynchronizedEvents = False
+    UserAgent = 'SDMS Tracker Client'
+    Left = 24
+    Top = 80
+  end
+  object SDMSRequest: TRESTRequest
+    Client = SDMSClient
+    Params = <>
+    Response = SDMSResponse
+    SynchronizedEvents = False
+    Left = 104
+    Top = 80
+  end
+  object SDMSResponse: TRESTResponse
+    Left = 200
+    Top = 80
+  end
+  object OAuth2Authenticator: TOAuth2Authenticator
+    ResponseType = rtTOKEN
+    TokenType = ttBEARER
+    Left = 320
+    Top = 80
   end
 end

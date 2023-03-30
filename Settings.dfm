@@ -11,7 +11,7 @@ object SettingsForm: TSettingsForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDesktopCenter
+  Position = poOwnerFormCenter
   OnShow = FormShow
   TextHeight = 15
   object sLabel1: TsLabel
@@ -60,6 +60,7 @@ object SettingsForm: TSettingsForm
     Color = 3553081
     DataField = 'Token'
     DataSource = stDataSource
+    PasswordChar = '*'
     TabOrder = 3
   end
   object stDataSource: TDataSource
