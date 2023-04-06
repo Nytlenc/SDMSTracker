@@ -1,4 +1,4 @@
-object MainForm: TMainForm
+﻿object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'SDMS '#1087#1086#1084#1086#1097#1085#1080#1082
@@ -12,6 +12,7 @@ object MainForm: TMainForm
   Font.Style = []
   Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
   OnResize = FormResize
   OnShow = FormShow
   TextHeight = 15
@@ -40,6 +41,14 @@ object MainForm: TMainForm
     ExplicitHeight = 279
     RowHeights = (
       24)
+  end
+  object Button2: TButton
+    Left = 456
+    Top = 80
+    Width = 75
+    Height = 25
+    Caption = 'Button2'
+    TabOrder = 2
   end
   object sSkinManager: TsSkinManager
     ButtonsOptions.OldGlyphsMode = False
@@ -4003,5 +4012,15 @@ object MainForm: TMainForm
     TokenType = ttBEARER
     Left = 320
     Top = 80
+  end
+  object LaborСostsSDMSTimer: TTimer
+    Enabled = False
+    OnTimer = LaborСostsSDMSTimerTimer
+    Left = 376
+    Top = 8
+  end
+  object NotificationCenter: TNotificationCenter
+    Left = 496
+    Top = 8
   end
 end
