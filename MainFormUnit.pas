@@ -110,18 +110,38 @@ var
   SDMSObject: TJSONObject;
   SDMSTask: TJSONObject;
   JSONArray: TJSONArray;
-  strduration: string;
+  strduration, strdatestart, strdaternd: string;
   Params: TStringList;
+  NowDate: TDateTime;
+  code, mess: String;
+  i: Integer;
 begin
   Result := 0;
+  NowDate := EncodeDateTime(YearOf(Now), MonthOf(Now), DayOf(Now), 0, 0, 0, 0);
 
   Params := TStringList.Create();
   Params.AddPair('performer', 'Sinichenko.AN@dns-shop.ru');
-  Params.AddPair('dateStart', '2023-04-06');
-  Params.AddPair('dateEnd', '2023-04-06');
+  Params.AddPair('dateStart', FormatDateTime('yyyy-mm-dd', NowDate));
+  Params.AddPair('dateEnd', FormatDateTime('yyyy-mm-dd', NowDate));
 
-  SDMSObject := SDMSAPIRequest('/elapsedTime/report', rmGET, Params);
-  Params.Free();
+  for i := 1 to 5 do
+  begin
+    SDMSObject := SDMSAPIRequest('/elapsedTime/report', rmGET, Params);
+    Params.Free();
+
+    code := SDMSObject.Values['code'].AsType<String>;
+    mess := SDMSObject.Values['message'].AsType<String>;
+    if code = '0' then
+      break;
+
+    Sleep(5000);
+  end;
+
+  if mess <> '' then
+  begin
+    ShowMessage('SDMS API недоступен по причине:' + mess);
+    Exit;
+  end;
 
   JSONArray := SDMSObject.Values['data'].AsType<TJSONArray>;
   with JSONArray.GetEnumerator do

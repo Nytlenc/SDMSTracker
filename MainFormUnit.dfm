@@ -43,8 +43,8 @@
       24)
   end
   object Button2: TButton
-    Left = 456
-    Top = 80
+    Left = 464
+    Top = 104
     Width = 75
     Height = 25
     Caption = 'Button2'
