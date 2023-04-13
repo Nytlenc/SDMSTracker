@@ -31,18 +31,9 @@ implementation
 
 {$R *.dfm}
 
-function FindWndByName(StartHWND: HWND; AString: String): HWND;
-var
-  Buffer: array [0 .. 255] of char;
-begin
-  Result := StartHWND;
-  repeat
-    Result := FindWindowEx(0, Result, nil, nil);
-    GetWindowText(Result, Buffer, SizeOf(Buffer));
-    if StrPos(StrUpper(Buffer), PChar(UpperCase(AString))) <> nil then
-      Break;
-  until (Result = 0);
-end;
+uses MainFormUnit;
+
+
 
 procedure TSDMSLinkOpen.Button1Click(Sender: TObject);
 var
@@ -50,7 +41,7 @@ var
   SIH: TSendInputHelper;
 begin
   Close();
-  Wnd := FindWndByName(0, 'SDMS, версия');
+  Wnd := MainForm.FindWndByName(0, MainForm.SDMSWindowName);
   if (Wnd = 0) or (Wnd = Application.Handle) then
   begin
     ShowMessage('Для работы функционала откройте тонкий клиент SDMS');

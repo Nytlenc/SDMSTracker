@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, System.JSON,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinManager, Vcl.ExtCtrls, Vcl.Menus, ClipBrd, Vcl.StdCtrls, REST.Types,
   REST.Client, Data.Bind.Components, Data.Bind.ObjectScope, REST.Authenticator.OAuth.WebForm.Win,
-  REST.Authenticator.OAuth, Vcl.Grids, Data.DB, Vcl.DBGrids, acDBGrid, DateUtils, Math, System.Notification;
+  REST.Authenticator.OAuth, Vcl.Grids, Data.DB, Vcl.DBGrids, acDBGrid, DateUtils, Math, System.Notification, ShellAPI;
 
 type
   TMainForm = class(TForm)
@@ -22,9 +22,11 @@ type
     OAuth2Authenticator: TOAuth2Authenticator;
     Button1: TButton;
     TasksGrid: TStringGrid;
-    LaborÑostsSDMSTimer: TTimer;
+    OnUpdate: TTimer;
     NotificationCenter: TNotificationCenter;
     Button2: TButton;
+    Memo1: TMemo;
+    Button3: TButton;
     procedure OnClipboardTextChanged(ClpbrdText: String);
     procedure TaskGridAutoSizeCol(Grid: TStringGrid; Column: Integer);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -40,11 +42,14 @@ type
     function SDMSAPIRequest(Resource: String; Method: TRESTRequestMethod; Params: TStringList): TJSONObject;
     function GetCrrentLaborCosts(): Extended;
     procedure FormCreate(Sender: TObject);
-    procedure LaborÑostsSDMSTimerTimer(Sender: TObject);
+    procedure OnUpdateTimer(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    function FindWndByName(StartHWND: HWND; AString: String): HWND;
+    procedure SetCurrentWndName();
   private
     { Private declarations }
   public
-    { Public declarations }
+    SDMSWindowName: String;
   end;
 
 var
@@ -61,10 +66,23 @@ uses Settings, SDMSLinkOpenUnit;
 
 // General functions
 
-procedure SetCurrentWndName();
+function TMainForm.FindWndByName(StartHWND: HWND; AString: String): HWND;
+var
+  Buffer: array [0 .. 255] of char;
+begin
+  Result := StartHWND;
+  repeat
+    Result := FindWindowEx(0, Result, nil, nil);
+    GetWindowText(Result, Buffer, SizeOf(Buffer));
+    if StrPos(StrUpper(Buffer), PChar(UpperCase(AString))) <> nil then
+      Break;
+  until (Result = 0);
+end;
+
+procedure TMainForm.SetCurrentWndName();
 var
   ActiveWindow: HWND;
-  buf: array [0 .. 255] of Char;
+  buf: array [0 .. 255] of char;
   WNDName: string;
 begin
   ActiveWindow := GetForegroundWindow;
@@ -132,7 +150,7 @@ begin
     code := SDMSObject.Values['code'].AsType<String>;
     mess := SDMSObject.Values['message'].AsType<String>;
     if code = '0' then
-      break;
+      Break;
 
     Sleep(5000);
   end;
@@ -173,6 +191,35 @@ end;
 
 // Timers
 
+procedure TMainForm.Button2Click(Sender: TObject);
+var
+  SDMSObject: TJSONObject;
+  SDMSTask: TJSONObject;
+  JSONArray: TJSONArray;
+  strduration, strdatestart, strdaternd: string;
+  Params: TStringList;
+  NowDate: TDateTime;
+  code, mess: String;
+  i: Integer;
+begin
+  NowDate := EncodeDateTime(YearOf(Now), MonthOf(Now), DayOf(Now), 0, 0, 0, 0);
+
+  Params := TStringList.Create();
+  Params.AddPair('performer', 'Sinichenko.AN@dns-shop.ru');
+  Params.AddPair('dateStart', FormatDateTime('yyyy-mm-dd', NowDate));
+  Params.AddPair('dateEnd', FormatDateTime('yyyy-mm-dd', NowDate));
+
+  SDMSObject := SDMSAPIRequest('/elapsedTime/report', rmGET, Params);
+  Params.Free();
+
+  code := SDMSObject.Values['code'].AsType<String>;
+  mess := SDMSObject.Values['message'].AsType<String>;
+
+  Memo1.Lines.Add(DateTimeToStr(Now));
+  Memo1.Lines.Add(Format('%s: %s', [code, mess]));
+
+end;
+
 procedure TMainForm.clpBrdTimerTimer(Sender: TObject);
 var
   ClpbrdText: string;
@@ -181,7 +228,7 @@ begin
   if ((ClpbrdText <> '') and (ClpbrdText <> OldClpbrdText)) then
   begin
     SetCurrentWndName();
-    if (pos('SDMS ïîìîùíèê', CurrentWndName) = 0) and (pos('SDMS, âåðñèÿ', CurrentWndName) = 0) and
+    if (pos('SDMS ïîìîùíèê', CurrentWndName) = 0) and (pos(SDMSWindowName, CurrentWndName) = 0) and
       (CurrentWndName <> '') then
     begin
       OnClipboardTextChanged(ClpbrdText);
@@ -190,34 +237,64 @@ begin
   end;
 end;
 
-procedure TMainForm.LaborÑostsSDMSTimerTimer(Sender: TObject);
+procedure TMainForm.OnUpdateTimer(Sender: TObject);
 var
   Today: TDateTime;
   NeedHour, NeedMinute, DayOfWeek: Integer;
   NeedCosts, CurrentCosts: Extended;
   MyNotification: TNotification;
+  CheckLaborCosts, RunSDMSClient: Boolean;
+  runparams, server1c, base1c: string;
+  Wnd: HWND;
 begin
 
   // TODO: ïðèêðóòèòü ïðîèçâîäñòâåííûé êàëåíäàðü - ïðèìåð https://isdayoff.ru/20170724
   Today := Now;
-  NeedCosts := RoundTo(6.4, -2);
-
   if (DayOfTheWeek(Today) = 6) or (DayOfTheWeek(Today) = 7) then
     Exit;
 
-  NeedHour := SettingsForm.stClientDataSet.FieldByName('LaborÑostsHour').AsInteger;
-  NeedMinute := SettingsForm.stClientDataSet.FieldByName('LaborÑostsMinute').AsInteger;
+  CheckLaborCosts := SettingsForm.stClientDataSet.FieldByName('CheckLaborÑosts').AsBoolean;
+  RunSDMSClient := SettingsForm.stClientDataSet.FieldByName('SDMSRunClient').AsBoolean;
 
-  if (HourOf(Today) = NeedHour) and (MinuteOf(Today) = NeedMinute) and (SecondOf(Today) = 0) then
+  // Ïðîâåðêà òðóäîçàòðàò
+  if (CheckLaborCosts) then
   begin
-    CurrentCosts := GetCrrentLaborCosts();
-    if CurrentCosts < NeedCosts then
+    NeedCosts := RoundTo(6.4, -2);
+
+    NeedHour := SettingsForm.stClientDataSet.FieldByName('LaborÑostsHour').AsInteger;
+    NeedMinute := SettingsForm.stClientDataSet.FieldByName('LaborÑostsMinute').AsInteger;
+
+    if (HourOf(Today) = NeedHour) and (MinuteOf(Today) = NeedMinute) and (SecondOf(Today) = 0) then
     begin
-      MyNotification := NotificationCenter.CreateNotification;
-      MyNotification.Title := 'Ïîæàëóéñòà, ïðîâåðüòå òðóäîçàòðàòû';
-      MyNotification.AlertBody := 'Ïî êàëåíäàðþ: ' + FloatToStr(NeedCosts) + ' ÷. Âíåñåíî: ' +
-        FloatToStr(CurrentCosts) + ' ÷.';
-      NotificationCenter.PresentNotification(MyNotification);
+      CurrentCosts := GetCrrentLaborCosts();
+      if CurrentCosts < NeedCosts then
+      begin
+        MyNotification := NotificationCenter.CreateNotification;
+        MyNotification.Title := 'Ïîæàëóéñòà, ïðîâåðüòå òðóäîçàòðàòû';
+        MyNotification.AlertBody := 'Ïî êàëåíäàðþ: ' + FloatToStr(NeedCosts) + ' ÷. Âíåñåíî: ' +
+          FloatToStr(CurrentCosts) + ' ÷.';
+        NotificationCenter.PresentNotification(MyNotification);
+      end;
+    end;
+  end;
+
+  // Àâòîçàïóñê SDMS
+  if (RunSDMSClient) then
+  begin
+    NeedHour := SettingsForm.stClientDataSet.FieldByName('SDMSClientRunAtHour').AsInteger;
+    NeedMinute := SettingsForm.stClientDataSet.FieldByName('SDMSClientRunAtMinute').AsInteger;
+
+    if (HourOf(Today) = NeedHour) and (MinuteOf(Today) = NeedMinute) and (SecondOf(Today) = 0) then
+    begin
+      Wnd := FindWndByName(0, MainForm.SDMSWindowName);
+      if (Wnd <> 0) then
+        Exit;
+
+      server1c := SettingsForm.stClientDataSet.FieldByName('SDMSClientServer').AsString;
+      base1c := SettingsForm.stClientDataSet.FieldByName('SDMSClientBase').AsString;
+      runparams := Format('ENTERPRISE /S"%s\%s"', [server1c, base1c]);
+
+      ShellExecute(0, 'open', 'c:\Program Files (x86)\1cv8\common\1cestart.exe', PWideChar(runparams), nil, SW_HIDE);
     end;
   end;
 
@@ -305,6 +382,7 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FormatSettings.DecimalSeparator := '.';
+  SDMSWindowName := 'SDMS, âåðñèÿ';
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -322,7 +400,6 @@ begin
   SettingsForm.stClientDataSet.FileName := ExtractFilePath(Application.ExeName) + 'Settings.cds';
   SettingsForm.stClientDataSet.Active := True;
   clpBrdTimer.Enabled := SettingsForm.sDBLinkReplace.Checked;
-  LaborÑostsSDMSTimer.Enabled := SettingsForm.sDBCheckLaborÑosts.Checked;
 end;
 
 procedure TMainForm.TrayExitClick(Sender: TObject);

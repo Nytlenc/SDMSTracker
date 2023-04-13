@@ -1,4 +1,4 @@
-﻿object MainForm: TMainForm
+object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'SDMS '#1087#1086#1084#1086#1097#1085#1080#1082
@@ -37,18 +37,33 @@
     RowCount = 1
     FixedRows = 0
     TabOrder = 1
-    ExplicitWidth = 616
-    ExplicitHeight = 279
+    ExplicitLeft = 8
     RowHeights = (
       24)
   end
   object Button2: TButton
-    Left = 464
-    Top = 104
+    Left = 440
+    Top = 72
+    Width = 137
+    Height = 25
+    Caption = #1058#1077#1089#1090' '#1090#1088#1091#1076#1086#1079#1072#1090#1088#1072#1090
+    TabOrder = 2
+    OnClick = Button2Click
+  end
+  object Memo1: TMemo
+    Left = 235
+    Top = 184
+    Width = 377
+    Height = 241
+    TabOrder = 3
+  end
+  object Button3: TButton
+    Left = 456
+    Top = 120
     Width = 75
     Height = 25
-    Caption = 'Button2'
-    TabOrder = 2
+    Caption = 'Button3'
+    TabOrder = 4
   end
   object sSkinManager: TsSkinManager
     ButtonsOptions.OldGlyphsMode = False
@@ -4013,10 +4028,9 @@
     Left = 320
     Top = 80
   end
-  object LaborСostsSDMSTimer: TTimer
-    Enabled = False
-    OnTimer = LaborСostsSDMSTimerTimer
-    Left = 376
+  object OnUpdate: TTimer
+    OnTimer = OnUpdateTimer
+    Left = 344
     Top = 8
   end
   object NotificationCenter: TNotificationCenter
