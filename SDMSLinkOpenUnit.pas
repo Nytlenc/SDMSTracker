@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, Vcl.StdCtrls,
-  SendInputHelper;
+  SendInputHelper, ClipBrd;
 
 type
   TSDMSLinkOpen = class(TForm)
@@ -21,7 +21,7 @@ type
   private
     { Private declarations }
   public
-    { Public declarations }
+    ClpbrdText: String;
   end;
 
 var
@@ -33,13 +33,16 @@ implementation
 
 uses MainFormUnit;
 
-
-
 procedure TSDMSLinkOpen.Button1Click(Sender: TObject);
 var
   Wnd: HWND;
   SIH: TSendInputHelper;
+  CutText: String;
+  esibPos: Integer;
 begin
+  esibPos := pos('#e1cib/', ClpbrdText);
+  CutText := Copy(ClpbrdText, 0, esibPos);
+  Clipboard.AsText := StringReplace(ClpbrdText, CutText, '', [rfReplaceAll]);
   Close();
   Wnd := MainForm.FindWndByName(0, MainForm.SDMSWindowName);
   if (Wnd = 0) or (Wnd = Application.Handle) then

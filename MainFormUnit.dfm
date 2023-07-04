@@ -37,7 +37,8 @@ object MainForm: TMainForm
     RowCount = 1
     FixedRows = 0
     TabOrder = 1
-    ExplicitLeft = 8
+    ExplicitWidth = 616
+    ExplicitHeight = 279
     RowHeights = (
       24)
   end

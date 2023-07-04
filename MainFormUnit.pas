@@ -38,7 +38,7 @@ type
     procedure clpBrdTimerTimer(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure ShowSDMSOpenLinkForm();
+    procedure ShowSDMSOpenLinkForm(ClpbrdText: String);
     function SDMSAPIRequest(Resource: String; Method: TRESTRequestMethod; Params: TStringList): TJSONObject;
     function GetCrrentLaborCosts(): Extended;
     procedure FormCreate(Sender: TObject);
@@ -176,16 +176,12 @@ end;
 
 procedure TMainForm.OnClipboardTextChanged(ClpbrdText: String);
 var
-  SearchText, CutText: string;
   esibPos: Integer;
 begin
-  SearchText := '#e1cib/';
-  esibPos := pos(SearchText, ClpbrdText);
+  esibPos := pos('#e1cib/', ClpbrdText);
   if (esibPos > 0) then
   begin
-    CutText := Copy(ClpbrdText, 0, esibPos);
-    Clipboard.AsText := StringReplace(ClpbrdText, CutText, '', [rfReplaceAll]);
-    ShowSDMSOpenLinkForm();
+    ShowSDMSOpenLinkForm(ClpbrdText);
   end;
 end;
 
@@ -355,7 +351,7 @@ begin
 
 end;
 
-procedure TMainForm.ShowSDMSOpenLinkForm();
+procedure TMainForm.ShowSDMSOpenLinkForm(ClpbrdText: String);
 var
   x: Integer;
 begin
@@ -364,6 +360,7 @@ begin
   SDMSLinkOpen.Show();
   SDMSLinkOpen.Left := screen.WorkAreaWidth - SDMSLinkOpen.Width;
   SDMSLinkOpen.Top := screen.WorkAreaHeight;
+  SDMSLinkOpen.ClpbrdText := ClpbrdText;
   for x := 0 to SDMSLinkOpen.Height do
   begin
     Application.ProcessMessages;

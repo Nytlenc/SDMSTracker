@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.719,C:\Work\Delphi\Проекты\SDMSTracker\Unit2.dfm=C:\Work\Delphi\Проекты\SDMSTracker\SDMSLinkOpenUnit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.328,C:\Work\Delphi\Проекты\SDMSTracker\Unit1.dfm=C:\Work\Delphi\Проекты\SDMSTracker\MainFormUnit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.328,C:\Work\Delphi\Проекты\SDMSTracker\Unit1.pas=C:\Work\Delphi\Проекты\SDMSTracker\MainFormUnit.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.945,=C:\Work\Delphi\Проекты\SDMSTracker\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.719,C:\Work\Delphi\Проекты\SDMSTracker\Unit2.pas=C:\Work\Delphi\Проекты\SDMSTracker\SDMSLinkOpenUnit.pas</Transaction>
+  </Transactions>
+</BorlandProject>
